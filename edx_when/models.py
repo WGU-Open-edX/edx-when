@@ -203,6 +203,6 @@ class UserDate(TimeStampedModel):
         """
         Get a detailed representation of this model instance.
         """
-        return (f'UserDate(id={self.id}, user="{self.user.username}", '
+        return (f'UserDate(id={self.id}, user="{self.user.username}", '  # pylint: disable=no-member
                 f'first_component_block_id={self.first_component_block_id}, '
                 f'content_date={self.content_date.id})')
