@@ -29,8 +29,6 @@ class DatePolicy(TimeStampedModel):
     rel_date = models.DurationField(null=True, blank=True, db_index=True)
 
     class Meta:
-        """Django Metadata."""
-
         verbose_name_plural = 'Date policies'
 
     def __str__(self):
@@ -98,8 +96,6 @@ class ContentDate(models.Model):
     subsection_name = models.CharField(max_length=255, blank=True, default='', db_index=True)
 
     class Meta:
-        """Django Metadata."""
-
         unique_together = ('policy', 'location', 'field')
         indexes = [
             models.Index(fields=('course_id', 'block_type'), name='edx_when_course_block_type_idx'),
@@ -142,8 +138,6 @@ class UserDate(TimeStampedModel):
     is_content_gated = models.BooleanField(default=False)
 
     class Meta:
-        """Django Metadata."""
-
         indexes = [
             models.Index(fields=('user', 'first_component_block_id'), name='edx_when_user_first_block_idx'),
         ]
