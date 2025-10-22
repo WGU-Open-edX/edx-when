@@ -29,6 +29,8 @@ class DatePolicy(TimeStampedModel):
     rel_date = models.DurationField(null=True, blank=True, db_index=True)
 
     class Meta:
+        """Metadata for DatePolicy model — defines plural display name in the Django admin."""
+
         verbose_name_plural = 'Date policies'
 
     def __str__(self):
@@ -96,6 +98,8 @@ class ContentDate(models.Model):
     subsection_name = models.CharField(max_length=255, blank=True, default='', db_index=True)
 
     class Meta:
+        """Metadata for ContentDate model — enforces uniqueness and adds query performance indexes."""
+
         unique_together = ('policy', 'location', 'field')
         indexes = [
             models.Index(fields=('course_id', 'block_type'), name='edx_when_course_block_type_idx'),
@@ -138,6 +142,8 @@ class UserDate(TimeStampedModel):
     is_content_gated = models.BooleanField(default=False)
 
     class Meta:
+        """Metadata for UserDate model — adds indexes to optimize lookups by user and first block ."""
+
         indexes = [
             models.Index(fields=('user', 'first_component_block_id'), name='edx_when_user_first_block_idx'),
         ]
