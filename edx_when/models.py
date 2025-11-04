@@ -114,7 +114,7 @@ class ContentDate(models.Model):
         # Location already holds course id
         return f'ContentDate({self.policy}, {self.location}, {self.field}, {self.block_type})'
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         """
         Get a detailed representation of this model instance.
         """
@@ -191,7 +191,7 @@ class UserDate(TimeStampedModel):
         if self.abs_date is not None and isinstance(policy_date, datetime) and self.abs_date < policy_date:
             raise ValidationError(_("Override date must be later than policy date"))
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         """
         Get a string representation of this model instance.
         """
@@ -199,7 +199,7 @@ class UserDate(TimeStampedModel):
         # pylint: disable=no-member
         return f'{self.user.username}, {self.content_date.location}, {self.content_date.field}'
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         """
         Get a detailed representation of this model instance.
         """

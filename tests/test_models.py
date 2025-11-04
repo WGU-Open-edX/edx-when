@@ -9,8 +9,9 @@ import ddt
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from edx_when.models import DatePolicy, MissingScheduleError, ContentDate, UserDate
+from edx_when.models import ContentDate, DatePolicy, MissingScheduleError, UserDate
 from tests.test_models_app.models import DummySchedule
 
 User = get_user_model()
