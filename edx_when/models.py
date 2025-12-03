@@ -93,9 +93,9 @@ class ContentDate(models.Model):
     field = models.CharField(max_length=255, default='')
     active = models.BooleanField(default=True)
     block_type = models.CharField(max_length=255, null=True)
-    assignment_title = models.CharField(max_length=255, blank=True, default='', db_index=True)
+    assignment_title = models.CharField(max_length=255, blank=True, default='')
     course_name = models.CharField(max_length=255, blank=True, default='')
-    subsection_name = models.CharField(max_length=255, blank=True, default='', db_index=True)
+    subsection_name = models.CharField(max_length=255, blank=True, default='')
 
     class Meta:
         """Metadata for ContentDate model — enforces uniqueness and adds query performance indexes."""
@@ -103,8 +103,6 @@ class ContentDate(models.Model):
         unique_together = ('policy', 'location', 'field')
         indexes = [
             models.Index(fields=('course_id', 'block_type'), name='edx_when_course_block_type_idx'),
-            models.Index(fields=('assignment_title', 'course_id'), name='edx_when_assignment_course_idx'),
-            models.Index(fields=('subsection_name', 'course_id'), name='edx_when_subsection_course_idx'),
         ]
 
     def __str__(self):
@@ -138,15 +136,8 @@ class UserDate(TimeStampedModel):
     actor = models.ForeignKey(
         get_user_model(), null=True, default=None, blank=True, related_name="actor", on_delete=models.CASCADE
     )
-    first_component_block_id = UsageKeyField(null=True, blank=True, max_length=255, db_index=True)
+    first_component_block_id = UsageKeyField(null=True, blank=True, max_length=255)
     is_content_gated = models.BooleanField(default=False)
-
-    class Meta:
-        """Metadata for UserDate model — adds indexes to optimize lookups by user and first block ."""
-
-        indexes = [
-            models.Index(fields=('user', 'first_component_block_id'), name='edx_when_user_first_block_idx'),
-        ]
 
     @property
     def actual_date(self):

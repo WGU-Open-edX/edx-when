@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contentdate',
             name='assignment_title',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=255),
+            field=models.CharField(blank=True, default='', max_length=255),
         ),
         migrations.AddField(
             model_name='contentdate',
@@ -24,28 +24,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contentdate',
             name='subsection_name',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=255),
+            field=models.CharField(blank=True, default='', max_length=255),
         ),
         migrations.AddField(
             model_name='userdate',
             name='first_component_block_id',
-            field=opaque_keys.edx.django.models.UsageKeyField(blank=True, db_index=True, max_length=255, null=True),
+            field=opaque_keys.edx.django.models.UsageKeyField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
             model_name='userdate',
             name='is_content_gated',
             field=models.BooleanField(default=False),
-        ),
-        migrations.AddIndex(
-            model_name='contentdate',
-            index=models.Index(fields=['assignment_title', 'course_id'], name='edx_when_assignment_course_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='contentdate',
-            index=models.Index(fields=['subsection_name', 'course_id'], name='edx_when_subsection_course_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='userdate',
-            index=models.Index(fields=['user', 'first_component_block_id'], name='edx_when_user_first_block_idx'),
         ),
     ]
