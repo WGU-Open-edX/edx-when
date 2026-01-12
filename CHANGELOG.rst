@@ -13,6 +13,9 @@ Change Log
 
 Unreleased
 ~~~~~~~~~~
+[3.2.0] - 2026-01-12
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Extend ContentDate/UserDate models to support enhanced assignment metadata and future scheduling use cases.
 
 [3.1.0] - 2026-01-09
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
