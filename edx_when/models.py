@@ -29,7 +29,7 @@ class DatePolicy(TimeStampedModel):
     rel_date = models.DurationField(null=True, blank=True, db_index=True)
 
     class Meta:
-        """Django Metadata."""
+        """Metadata for DatePolicy model — defines plural display name in the Django admin."""
 
         verbose_name_plural = 'Date policies'
 
@@ -93,9 +93,12 @@ class ContentDate(models.Model):
     field = models.CharField(max_length=255, default='')
     active = models.BooleanField(default=True)
     block_type = models.CharField(max_length=255, null=True)
+    assignment_title = models.CharField(max_length=255, blank=True, default='')
+    course_name = models.CharField(max_length=255, blank=True, default='')
+    subsection_name = models.CharField(max_length=255, blank=True, default='')
 
     class Meta:
-        """Django Metadata."""
+        """Metadata for ContentDate model — enforces uniqueness and adds query performance indexes."""
 
         unique_together = ('policy', 'location', 'field')
         indexes = [
@@ -108,6 +111,14 @@ class ContentDate(models.Model):
         """
         # Location already holds course id
         return f'ContentDate({self.policy}, {self.location}, {self.field}, {self.block_type})'
+
+    def __repr__(self):  # pragma: no cover
+        """
+        Get a detailed representation of this model instance.
+        """
+        return (f'ContentDate(id={self.id}, assignment_title="{self.assignment_title}", '
+                f'course_name="{self.course_name}", subsection_name="{self.subsection_name}", '
+                f'policy={self.policy}, location={self.location})')
 
 
 class UserDate(TimeStampedModel):
@@ -125,6 +136,8 @@ class UserDate(TimeStampedModel):
     actor = models.ForeignKey(
         get_user_model(), null=True, default=None, blank=True, related_name="actor", on_delete=models.CASCADE
     )
+    first_component_block_id = UsageKeyField(null=True, blank=True, max_length=255)
+    is_content_gated = models.BooleanField(default=False)
 
     @property
     def actual_date(self):
@@ -148,6 +161,13 @@ class UserDate(TimeStampedModel):
         """
         return self.content_date.location
 
+    @property
+    def learner_has_access(self):
+        """
+        Return a boolean indicating whether the piece of content is accessible to the learner.
+        """
+        return not self.is_content_gated
+
     def clean(self):
         """
         Validate data before saving.
@@ -162,10 +182,18 @@ class UserDate(TimeStampedModel):
         if self.abs_date is not None and isinstance(policy_date, datetime) and self.abs_date < policy_date:
             raise ValidationError(_("Override date must be later than policy date"))
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         """
         Get a string representation of this model instance.
         """
         # Location already holds course id
         # pylint: disable=no-member
         return f'{self.user.username}, {self.content_date.location}, {self.content_date.field}'
+
+    def __repr__(self):  # pragma: no cover
+        """
+        Get a detailed representation of this model instance.
+        """
+        return (f'UserDate(id={self.id}, user="{self.user.username}", '  # pylint: disable=no-member
+                f'first_component_block_id={self.first_component_block_id}, '
+                f'content_date={self.content_date.id})')

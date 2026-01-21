@@ -9,8 +9,9 @@ import ddt
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from edx_when.models import DatePolicy, MissingScheduleError
+from edx_when.models import ContentDate, DatePolicy, MissingScheduleError, UserDate
 from tests.test_models_app.models import DummySchedule
 
 User = get_user_model()
@@ -64,3 +65,41 @@ class TestDatePolicy(TestCase):
     def test_mixed_dates(self):
         with self.assertRaises(ValidationError):
             DatePolicy(abs_date=datetime(2020, 1, 1), rel_date=timedelta(days=1)).full_clean()
+
+
+class TestUserDateModel(TestCase):
+    """Tests for the UserDate model."""
+
+    def setUp(self):
+        """Set up a user and content date for the tests."""
+        self.user = User.objects.create(username="test_user")
+        self.course_key = CourseKey.from_string('course-v1:TestX+Test+2025')
+        self.block_key = UsageKey.from_string('block-v1:TestX+Test+2025+type@sequential+block@test')
+        self.course_block_key = UsageKey.from_string('block-v1:TestX+Test+2025+type@course+block@course')
+        self.policy = DatePolicy.objects.create(abs_date=datetime(2025, 1, 15, 10, 0, 0))
+        self.content_date = ContentDate.objects.create(
+            course_id=self.course_key,
+            location=self.block_key,
+            field='due',
+            active=True,
+            policy=self.policy,
+            block_type='sequential'
+        )
+
+    def test_learner_has_access_when_not_gated(self):
+        """learner_has_access should be True when is_content_gated is False."""
+        user_date = UserDate.objects.create(
+            user=self.user,
+            content_date=self.content_date,
+            is_content_gated=False,
+        )
+        assert user_date.learner_has_access is True
+
+    def test_learner_has_access_when_gated(self):
+        """learner_has_access should be False when is_content_gated is True."""
+        user_date = UserDate.objects.create(
+            user=self.user,
+            content_date=self.content_date,
+            is_content_gated=True,
+        )
+        assert user_date.learner_has_access is False
