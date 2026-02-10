@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import DateTimeField, ExpressionWrapper, F, ObjectDoesNotExist, Q
+from django.db.models import DateTimeField, ExpressionWrapper, F, ObjectDoesNotExist, OuterRef, Q, Subquery
 from edx_django_utils.cache.utils import TieredCache
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -372,17 +372,25 @@ def get_overrides_for_course(course_id):
     """
     course_id = _ensure_key(CourseKey, course_id)
 
-    query = models.UserDate.objects.filter(
+    base_queryset = models.UserDate.objects.filter(
         content_date__course_id=course_id,
         content_date__active=True,
-    ).order_by('-modified')
-    dates = []
-    users = set()
-    for udate in query:
-        if udate.user_id in users:
-            continue
+    )
 
-        users.add(udate.user_id)
+    # For each (content_date location, user) pair, we want the most recent override.
+    # We use a subquery to select the latest modified record for each combination,
+    # and then filter the queryset to those records.
+    latest_per_location = base_queryset.filter(
+        content_date__location=OuterRef("content_date__location"),
+        user=OuterRef("user"),
+    ).order_by("-modified")
+
+    query = base_queryset.filter(
+        id=Subquery(latest_per_location.values("id")[:1])
+    ).order_by('-modified')
+
+    dates = []
+    for udate in query:
         username = udate.user.username
         try:
             full_name = udate.user.profile.name

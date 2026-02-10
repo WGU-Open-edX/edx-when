@@ -472,6 +472,7 @@ class ApiTests(TestCase):
         # Expected format: (username, full_name, email, location, date)
         expected_overrides = [
             (user2.username, 'unknown', user2.email, block1, override2),
+            (user2.username, 'unknown', user2.email, block2, override2),
             (user3.username, 'unknown', user3.email, block3, override3),
             (self.user.username, 'unknown', self.user.email, block1, override1),
         ]
